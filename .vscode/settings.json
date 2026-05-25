@@ -1,0 +1,7 @@
+{
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+  },
+  "python.defaultInterpreterPath": "${workspaceFolder}\\venv\\Scripts\\python.exe",
+  "python.analysis.typeCheckingMode": "strict",
+}
