@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any
 
 import numpy as np
@@ -42,19 +44,15 @@ class ProductStateMatrix:
         self.product_state_matrix = self.generate_product_state_matrix(number_of_spins, spin_value)
 
     def generate_product_state_matrix(self, number_of_spins: int, spin: number) -> np.ndarray:
-        s = spin
-        N = number_of_spins
-        b = int(2 * s + 1)
-        number_of_states = int(2 * s + 1) ** N
-        matrix = -s * np.ones([number_of_spins, number_of_states])
+        number_of_single_spin_states = int(2 * spin + 1)
+        number_of_product_states = number_of_single_spin_states**number_of_spins
+        matrix = np.empty([number_of_spins, number_of_product_states])
 
-        for x in range(b**N): # TODO
-            xsave = x
-            ind = 0
-            while x:
-                matrix[ind, xsave] = int(x % b) - s
-                x //= b
-                ind += 1
+        for state in range(number_of_product_states):
+            remainder = state
+            for spin_index in range(number_of_spins):
+                matrix[spin_index, state] = int(remainder % number_of_single_spin_states) - spin
+                remainder //= number_of_single_spin_states
         return matrix
 
     # methods for easier access
@@ -74,3 +72,7 @@ class ProductStateMatrix:
         The nth entry of the vector represents the state of the nth spin in this product state.
         """
         return SpinState(self.product_state_matrix[:, state_index].transpose())
+
+
+p = ProductStateMatrix(number_of_spins=3, spin_value=2)
+print(p.product_state_matrix)
