@@ -72,7 +72,3 @@ class ProductStateMatrix:
         The nth entry of the vector represents the state of the nth spin in this product state.
         """
         return SpinState(self.product_state_matrix[:, state_index].transpose())
-
-
-p = ProductStateMatrix(number_of_spins=3, spin_value=2)
-print(p.product_state_matrix)
