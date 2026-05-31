@@ -53,3 +53,7 @@ def get_x_unit_vector_tilted_in_xy_plane(angle: number) -> np.ndarray:
 
 def degree_to_radians(x_value: number) -> number:
     return x_value / 360 * 2 * PI
+
+
+def isclose(value1: complex_number, value2: complex_number, threshhold: number = 1e-5) -> bool:
+    return abs(value2 - value1) < threshhold

@@ -18,7 +18,7 @@ config: dict[str, Any] = {
     "variables": {
 
         "number_of_spins_N": 2,                            
-        "spin_s": 3/2,                             
+        "spin_s": 1/2,                             
         "heisenberg_interaction_constant_J": 1,
         "anisotropy_constant_D": -1,
         "temperatures": [1,2,4,8],
@@ -43,9 +43,9 @@ config: dict[str, Any] = {
                 "angle": 0,
             },
             "range": {
-                "start": 0,
-                "end": 90,
-                "number_of_steps": 361,
+                "start": -50,
+                "end": 200,
+                "number_of_steps": 400,
             }
         },
     },
@@ -172,10 +172,8 @@ config: dict[str, Any] = {
             "magnetization_thermal": "{parameter_id}_M{direction}_magnetization_thermal_expval.png",
         },
 
-        "npy_files": {
-            "x_values": "{parameter_id}_x_values.npy",
-            "eigenvalues": "{parameter_id}_eigenvalues.npy",
-            "eigenvectors": "{parameter_id}_eigenvectors.npy",
+        "npz_files": {
+            "diagonalization_results": "{parameter_id}_diag_results.npz",
         }
 
     }
