@@ -69,3 +69,4 @@ dmypy.json
 # generated Data
 data
 results
+parameters.db

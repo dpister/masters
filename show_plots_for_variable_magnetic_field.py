@@ -119,6 +119,7 @@ def main():
         x_values=x_values,
         eigenvalues=all_eigenvalues,
         eigenvectors=all_eigenvectors,
+        temperatures=temperatures,
         spin_expectation_values=all_spin_expectation_values,
     )
     results.sort()
