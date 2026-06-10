@@ -12,10 +12,10 @@ def calculate_canonical_partition_sum(temperature: number, eigenvalues: np.ndarr
 
 def calculate_thermal_expectation_value(
     temperature: number,
-    canonical_sum: number,
     expectation_values: np.ndarray,
     eigenvalues: np.ndarray,
 ) -> number:
+    canonical_sum = calculate_canonical_partition_sum(temperature=temperature, eigenvalues=eigenvalues)
     result = 0
     for expectation_value, eigenvalue in zip(expectation_values, eigenvalues):
         result += math.exp(-eigenvalue / temperature) * expectation_value

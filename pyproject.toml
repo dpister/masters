@@ -1,4 +1,6 @@
 [tool.ruff]
 exclude = [".venv"]
-extend-exclude = ["config.py"]
-line-length = 100
+extend-exclude = [
+    "config.py", 
+]
+line-length = 120

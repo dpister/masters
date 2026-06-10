@@ -1,68 +1,97 @@
-from typing import Any
+# import matplotlib
 
+# better performance but can't show plots, only savefig
+# yes, you have to put it here (before the matplotlib.pyplot import)
+# matplotlib.use("Agg")
+
+
+from matplotlib.lines import Line2D
 import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.style as mplstyle
 
 from math_helper import number
-from config import config
 
 
-class Subplot:
+class Plot:
     """
-    Wrapper class to combine Figures and Axes
-    and to simplify matplotblib calls by preapplying some default values or bundling calls.
-    Also hides away the ugly typing of matplotlib.
+    Wrapper class to simplify matplotblib calls by preapplying some default values or bundling calls.
+    Manages a single figure and ax to minimize overhead.
+    Also hides away the typing problems of matplotlib.
     """
+
+    LEGEND_LABELSIZE = 13
+    TICKSIZE = 12
+    LABELSIZE = 15
+    LINEWIDTH = 0
+    WINDOWSIZE_X = 13
+    WINDOWSIZE_Y = 7
+    MARKER = "."
+    TITLE_LOCATION = "center"
+    LEGEND_LOCATION = "upper right"
+    BBOX_INCHES = "tight"  # removes whitespace around plot when saving
+    RASTERIZED = True  # boosts performance
+    COLORMAP_NAME = "tab20"
+
+    mplstyle.use("fast")
 
     def __init__(self):
         self.fig, self.ax = plt.subplots()  # type: ignore
 
-    def set_title(self, template_string: str, **kwargs: dict[str, Any]) -> None:
-        title = template_string.format(**kwargs)
-        return self.ax.set_title(title)  # type: ignore
-
     def configure(
         self,
-        xlabel: str,
-        ylabel: str,
-        y_interval: tuple[number, number],
+        xlabel: str | None = None,
+        ylabel: str | None = None,
         title: str | None = None,
-        labelsize: int = config["plot"]["labelsize"],
-        ticksize: int = config["plot"]["ticksize"],
+        y_interval: tuple[number, number] | tuple[()] | None = None,
     ) -> None:
+        self.ax.tick_params(axis="both", labelsize=self.TICKSIZE)  # type: ignore
+        if xlabel is not None:
+            self.ax.set_xlabel(xlabel, fontsize=self.LABELSIZE)  # type: ignore
+        if ylabel is not None:
+            self.ax.set_ylabel(ylabel, fontsize=self.LABELSIZE)  # type: ignore
         if title is not None:
-            self.ax.set_title(title, fontsize=labelsize)  # type: ignore
-        self.ax.set_xlabel(xlabel, fontsize=labelsize)  # type: ignore
-        self.ax.set_ylabel(ylabel, fontsize=labelsize)  # type: ignore
-        self.ax.tick_params(axis="both", labelsize=ticksize)  # type: ignore
-        self.ax.set_ylim(y_interval)
+            self.ax.set_title(title, fontsize=self.LABELSIZE)  # type: ignore
+        if y_interval:
+            self.ax.set_ylim(y_interval)
 
     def plot(
         self,
         xvalues: np.ndarray | number,
         yvalues: np.ndarray | number,
-        color: str = config["plot"]["default_color"],
-        marker: str = config["plot"]["marker"],
-        linewidth: number = config["plot"]["linewidth"],
+        color: str | None = None,
+        color_values: np.ndarray | None = None,
     ) -> None:
-        self.ax.scatter(  # type: ignore
-            xvalues, yvalues, color=color, marker=marker, linewidths=linewidth
-        )
+        if color is not None and color_values is not None:
+            raise Exception("Either set color or color_values, not both")
+        if color_values is not None:
+            self.ax.scatter(  # type: ignore
+                xvalues,
+                yvalues,
+                c=color_values,
+                cmap=self.COLORMAP_NAME,
+                marker=self.MARKER,
+                linewidths=self.LINEWIDTH,
+                rasterized=self.RASTERIZED,
+            )
+        else:
+            self.ax.scatter(  # type: ignore
+                xvalues, yvalues, color=color, marker=self.MARKER, linewidths=self.LINEWIDTH, rasterized=self.RASTERIZED
+            )
 
-    def set_legend(
-        self,
-        labels: list[str],
-        location: str = config["plot"]["legend_location"],
-        legendsize: int = config["plot"]["legendsize"],
-    ) -> None:
-        self.ax.legend(labels, loc=location, fontsize=legendsize)  # type: ignore
+    def set_legend(self, labels: list[str] | None = None, color_values: list[int] | None = None) -> None:
+        if labels is None:
+            self.ax.legend(loc=self.LEGEND_LOCATION, fontsize=self.LEGEND_LABELSIZE)  # type: ignore
+        elif color_values is None:
+            self.ax.legend(labels=labels, loc=self.LEGEND_LOCATION, fontsize=self.LEGEND_LABELSIZE)  # type: ignore
+        else:
+            colormap = plt.get_cmap(self.COLORMAP_NAME)
+            colors = [colormap(v) for v in color_values]
+            legend_elements = [
+                Line2D([0], [0], marker=self.MARKER, linestyle="", color=color, label=label)
+                for label, color in zip(labels, colors)
+            ]
+            self.ax.legend(handles=legend_elements, loc=self.LEGEND_LOCATION, fontsize=self.LEGEND_LABELSIZE)  # type: ignore
 
-    def save(
-        self,
-        save_path: str,
-        should_trim: bool = config["plot"]["should_trim_whitespace_around_plot"],
-        **kwargs: dict[str, Any],
-    ) -> None:
-        bbox_inches = "tight" if should_trim else None
-        save_path_formatted = save_path.format(**kwargs)
-        self.fig.savefig(save_path_formatted, bbox_inches=bbox_inches)  # type: ignore
+    def save(self, path: str) -> None:
+        self.fig.savefig(path, bbox_inches=self.BBOX_INCHES)  # type: ignore

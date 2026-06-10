@@ -2,23 +2,24 @@ import math
 
 import numpy as np
 
-from math_helper import BOHR_MAGNETON
+from math_helper import MU_B, LANDE_FACTOR
 from product_states import ProductStateMatrix
-from spin import SpinRing
+from spin import Spin
 
 
 def get_heisenberg_interaction_hamiltonian_matrix(
-    spin_ring: SpinRing, product_state_matrix: ProductStateMatrix
+    heisenberg_interaction_matrix: np.ndarray, product_state_matrix: ProductStateMatrix
 ) -> np.ndarray:
     """
-    generate the Hamiltonian matrix for the Heisenberg interaction
-    of a spin ring using the product basis
+    Generate the Hamiltonian matrix for the Heisenberg interaction
     """
 
-    N = number_of_spins = spin_ring.number_of_spins
-    s = spin_ring.spin
-    J = spin_ring.heisenberg_interaction_matrix
-    number_of_states = int(2 * s + 1) ** N
+    assert len(heisenberg_interaction_matrix.shape) == 2
+    assert heisenberg_interaction_matrix.shape[0] == heisenberg_interaction_matrix.shape[1]
+
+    J = heisenberg_interaction_matrix
+    number_of_spins = product_state_matrix.number_of_spins
+    number_of_states = product_state_matrix.number_of_product_states
 
     hamiltonian = np.zeros([number_of_states, number_of_states]) * 1j
 
@@ -27,46 +28,44 @@ def get_heisenberg_interaction_hamiltonian_matrix(
             #
 
             for spin1 in range(number_of_spins):
-                mk = product_state_matrix.spin(spin1)[j]
+                m1 = product_state_matrix.spin(spin1)[j]
+                s1 = product_state_matrix.spin_values[spin1]
 
                 for spin2 in range(spin1):
-                    ml = product_state_matrix.spin(spin2)[j]
+                    m2 = product_state_matrix.spin(spin2)[j]
+                    s2 = product_state_matrix.spin_values[spin2]
 
                     if i == j:
-                        hamiltonian[i, i] += mk * ml * J[spin1, spin2]
+                        hamiltonian[i, i] += m1 * m2 * J[spin1, spin2]
 
-                    if product_state_matrix.state(i) == product_state_matrix.state(j).changed(
-                        spin1, +1
-                    ).changed(spin2, -1):
+                    if product_state_matrix.state(i) == product_state_matrix.state(j).changed(spin1, +1).changed(
+                        spin2, -1
+                    ):
                         hamiltonian[i, j] += (
                             J[spin1, spin2]
                             / 2
-                            * math.sqrt(s * (s + 1) - mk * (mk + 1))
-                            * math.sqrt(s * (s + 1) - ml * (ml - 1))
+                            * math.sqrt(s1 * (s1 + 1) - m1 * (m1 + 1))
+                            * math.sqrt(s2 * (s2 + 1) - m2 * (m2 - 1))
                         )
 
-                    if product_state_matrix.state(i) == product_state_matrix.state(j).changed(
-                        spin1, -1
-                    ).changed(spin2, +1):
+                    if product_state_matrix.state(i) == product_state_matrix.state(j).changed(spin1, -1).changed(
+                        spin2, +1
+                    ):
                         hamiltonian[i, j] += (
                             J[spin1, spin2]
                             / 2
-                            * math.sqrt(s * (s + 1) - mk * (mk - 1))
-                            * math.sqrt(s * (s + 1) - ml * (ml + 1))
+                            * math.sqrt(s1 * (s1 + 1) - m1 * (m1 - 1))
+                            * math.sqrt(s2 * (s2 + 1) - m2 * (m2 + 1))
                         )
 
     return hamiltonian
 
 
-def get_zeeman_hamiltonian_matrix(
-    spin_ring: SpinRing, product_state_matrix: ProductStateMatrix
-) -> np.ndarray:
-    """generate the Hamiltonian matrix of the Zeeman term of a spin ring using the product basis"""
+def get_zeeman_hamiltonian_matrix(spins: list[Spin], product_state_matrix: ProductStateMatrix) -> np.ndarray:
+    """Generate the Hamiltonian matrix of the Zeeman term using the product basis"""
 
-    N = number_of_spins = spin_ring.number_of_spins
-    s = spin_ring.spin
-    MU_B = BOHR_MAGNETON
-    number_of_states = int(2 * s + 1) ** N
+    number_of_spins = product_state_matrix.number_of_spins
+    number_of_states = product_state_matrix.number_of_product_states
 
     hamiltonian = np.zeros([number_of_states, number_of_states]) * 1j
 
@@ -75,40 +74,34 @@ def get_zeeman_hamiltonian_matrix(
             #
 
             for spin_index in range(number_of_spins):
-                spin = spin_ring.spins[spin_index]
+                spin = spins[spin_index]
                 m = product_state_matrix.spin(spin_index)[j]
+                s = product_state_matrix.spin_values[spin_index]
 
                 if i == j:
-                    hamiltonian[i, j] += 2 * MU_B * m * spin.B_z
+                    hamiltonian[i, j] += LANDE_FACTOR * MU_B * m * spin.B_z
 
-                if product_state_matrix.state(i) == product_state_matrix.state(j).changed(
-                    spin_index, +1
-                ):
+                if product_state_matrix.state(i) == product_state_matrix.state(j).changed(spin_index, +1):
                     hamiltonian[i, j] += (
-                        MU_B * math.sqrt(s * (s + 1) - m * (m + 1)) * (spin.B_x - spin.B_y * 1j)
+                        1 / 2 * LANDE_FACTOR * MU_B * math.sqrt(s * (s + 1) - m * (m + 1)) * (spin.B_x - spin.B_y * 1j)
                     )
 
-                if product_state_matrix.state(i) == product_state_matrix.state(j).changed(
-                    spin_index, -1
-                ):
+                if product_state_matrix.state(i) == product_state_matrix.state(j).changed(spin_index, -1):
                     hamiltonian[i, j] += (
-                        MU_B * math.sqrt(s * (s + 1) - m * (m - 1)) * (spin.B_x + spin.B_y * 1j)
+                        1 / 2 * LANDE_FACTOR * MU_B * math.sqrt(s * (s + 1) - m * (m - 1)) * (spin.B_x + spin.B_y * 1j)
                     )
 
     return hamiltonian
 
 
-def get_anisotropy_hamiltonian_matrix(
-    spin_ring: SpinRing, product_state_matrix: ProductStateMatrix
-) -> np.ndarray:
+def get_anisotropy_hamiltonian_matrix(spins: list[Spin], product_state_matrix: ProductStateMatrix) -> np.ndarray:
     """
-    generate the Hamiltonian matrix of the anisotropy term of a spin ring
+    Generate the Hamiltonian matrix of the anisotropy term of spins
     with one main anisotropy axis using the product basis
     """
 
-    N = number_of_spins = spin_ring.number_of_spins
-    s = spin_ring.spin
-    number_of_states = int(2 * s + 1) ** N
+    number_of_spins = product_state_matrix.number_of_spins
+    number_of_states = product_state_matrix.number_of_product_states
 
     hamiltonian = np.zeros([number_of_states, number_of_states]) * 1j
 
@@ -117,55 +110,46 @@ def get_anisotropy_hamiltonian_matrix(
             #
 
             for spin_index in range(number_of_spins):
-                spin = spin_ring.spins[spin_index]
+                spin = spins[spin_index]
                 m = product_state_matrix.spin(spin_index)[j]
+                s = product_state_matrix.spin_values[spin_index]
 
                 if i == j:
-                    hamiltonian[i, i] += spin.D * spin.D_z**2 * m**2
+                    hamiltonian[i, i] += spin.D * spin.e_D_z**2 * m**2
                     hamiltonian[i, i] += (
-                        spin.D
-                        * (2 * s * (s + 1) - 2 * m**2)
-                        * (1 / 4 * spin.D_x**2 + 1 / 4 * spin.D_y**2)
+                        spin.D * (2 * s * (s + 1) - 2 * m**2) * (1 / 4 * spin.e_D_x**2 + 1 / 4 * spin.e_D_y**2)
                     )
 
-                if product_state_matrix.state(i) == product_state_matrix.state(j).changed(
-                    spin_index, +1
-                ):
+                if product_state_matrix.state(i) == product_state_matrix.state(j).changed(spin_index, +1):
                     hamiltonian[i, j] += (
                         spin.D
                         * math.sqrt(s * (s + 1) - m * (m + 1))
                         * (2 * m + 1)
-                        * (1 / 2 * spin.D_x * spin.D_z - 1j / 2 * spin.D_y * spin.D_z)
+                        * (1 / 2 * spin.e_D_x * spin.e_D_z - 1j / 2 * spin.e_D_y * spin.e_D_z)
                     )
 
-                if product_state_matrix.state(i) == product_state_matrix.state(j).changed(
-                    spin_index, -1
-                ):
+                if product_state_matrix.state(i) == product_state_matrix.state(j).changed(spin_index, -1):
                     hamiltonian[i, j] += (
                         spin.D
                         * math.sqrt(s * (s + 1) - m * (m - 1))
                         * (2 * m - 1)
-                        * (1 / 2 * spin.D_x * spin.D_z + 1j / 2 * spin.D_y * spin.D_z)
+                        * (1 / 2 * spin.e_D_x * spin.e_D_z + 1j / 2 * spin.e_D_y * spin.e_D_z)
                     )
 
-                if product_state_matrix.state(i) == product_state_matrix.state(j).changed(
-                    spin_index, +2
-                ):
+                if product_state_matrix.state(i) == product_state_matrix.state(j).changed(spin_index, +2):
                     hamiltonian[i, j] += (
                         spin.D
                         * math.sqrt(s * (s + 1) - m * (m + 1))
                         * math.sqrt(s * (s + 1) - (m + 1) * (m + 2))
-                        * (1 / 4 * spin.D_x**2 - 1 / 4 * spin.D_y**2 - 1j / 2 * spin.D_x * spin.D_y)
+                        * (1 / 4 * spin.e_D_x**2 - 1 / 4 * spin.e_D_y**2 - 1j / 2 * spin.e_D_x * spin.e_D_y)
                     )
 
-                if product_state_matrix.state(i) == product_state_matrix.state(j).changed(
-                    spin_index, -2
-                ):
+                if product_state_matrix.state(i) == product_state_matrix.state(j).changed(spin_index, -2):
                     hamiltonian[i, j] += (
                         spin.D
                         * math.sqrt(s * (s + 1) - m * (m - 1))
                         * math.sqrt(s * (s + 1) - (m - 1) * (m - 2))
-                        * (1 / 4 * spin.D_x**2 - 1 / 4 * spin.D_y**2 + 1j / 2 * spin.D_x * spin.D_y)
+                        * (1 / 4 * spin.e_D_x**2 - 1 / 4 * spin.e_D_y**2 + 1j / 2 * spin.e_D_x * spin.e_D_y)
                     )
 
     return hamiltonian

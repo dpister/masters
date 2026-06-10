@@ -3,9 +3,9 @@ import sqlite3
 from types import TracebackType
 from typing import Any, Type
 
-from spin import SpinRing
+from spin_ring import SpinRing
 
-from math_helper import indices_mapping
+from math_helper import indices_mapping, number
 
 
 class DatabaseException(Exception):
@@ -54,13 +54,13 @@ class ParameterDatabase(Database):
             B_x REAL,
             B_y REAL,
             B_z REAL,
+            B_strength REAL,
             B_type TEXT NOT NULL CHECK (B_type IN ('circular', 'linear')),
             D REAL,
             J REAL,
             s REAL,
             N INTEGER,
-            D_angle REAL,
-            data_path TEXT
+            D_angle REAL
         )
         """
 
@@ -77,6 +77,7 @@ class ParameterDatabase(Database):
         B_x = ? AND
         B_y = ? AND
         B_z = ? AND
+        B_strength = ? AND
         B_type = ? AND
         D = ? AND
         J = ? AND
@@ -89,9 +90,10 @@ class ParameterDatabase(Database):
         row = self._cursor.execute(
             self._GET_PARAMETER_ID_QUERY,
             (
-                spin_ring.magnetic_field_of_first_spin[indices_mapping["x"]],
-                spin_ring.magnetic_field_of_first_spin[indices_mapping["y"]],
-                spin_ring.magnetic_field_of_first_spin[indices_mapping["z"]],
+                spin_ring.magnetic_field_direction_of_first_spin[indices_mapping["x"]],
+                spin_ring.magnetic_field_direction_of_first_spin[indices_mapping["y"]],
+                spin_ring.magnetic_field_direction_of_first_spin[indices_mapping["z"]],
+                spin_ring.magnetic_field_strength,
                 spin_ring.magnetic_field_type,
                 spin_ring.anisotropy_value,
                 spin_ring.heisenberg_interaction_constant,
@@ -110,6 +112,7 @@ class ParameterDatabase(Database):
             B_x,
             B_y,
             B_z,
+            B_strength,
             B_type,
             D,
             J,
@@ -117,16 +120,17 @@ class ParameterDatabase(Database):
             N,
             D_angle
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
 
     def create_parameter_id(self, spin_ring: SpinRing) -> int:
         self._cursor.execute(
             self._INSERT_PARAMETERS_QUERY,
             (
-                spin_ring.magnetic_field_of_first_spin[indices_mapping["x"]],
-                spin_ring.magnetic_field_of_first_spin[indices_mapping["y"]],
-                spin_ring.magnetic_field_of_first_spin[indices_mapping["z"]],
+                spin_ring.magnetic_field_direction_of_first_spin[indices_mapping["x"]],
+                spin_ring.magnetic_field_direction_of_first_spin[indices_mapping["y"]],
+                spin_ring.magnetic_field_direction_of_first_spin[indices_mapping["z"]],
+                spin_ring.magnetic_field_strength,
                 spin_ring.magnetic_field_type,
                 spin_ring.anisotropy_value,
                 spin_ring.heisenberg_interaction_constant,
@@ -141,33 +145,87 @@ class ParameterDatabase(Database):
         else:
             raise CreationException()
 
-    _UPDATE_DATA_PATH_QUERY = """
-        UPDATE parameters 
-        SET data_path = ? 
-        WHERE parameter_id = ?
-        """
-
-    def set_data_path(self, parameter_id: int, data_path: str) -> None:
-        self._cursor.execute(
-            self._UPDATE_DATA_PATH_QUERY,
-            (data_path, parameter_id),
-        )
-        self._connection.commit()
-
-    _GET_DATA_PATH_QUERY = """
-        SELECT (data_path)
-        FROM parameters 
-        WHERE parameter_id = ?
-        """
-
-    def get_npz_data_path(self, parameter_id: int) -> str:
-        row = self._cursor.execute(self._GET_DATA_PATH_QUERY, (parameter_id,)).fetchone()
-        if row is None:
-            raise NoRowFoundException(f"No entry found with this parameter ID: {parameter_id}")
-        return self._get_row_data(row, "data_path")
-
     def _get_row_data(self, row: sqlite3.Row, column: str) -> Any:
         return_value = row[column]
         if return_value is None:
             raise MissingValueException(f'Missing data for column "{column}"')
         return return_value
+
+    _GET_PARAMETER_IDS_BY_ANGLE_INTERVAL_QUERY = """
+        SELECT parameter_id, D_angle
+        FROM parameters
+        WHERE 
+        B_x = ? AND
+        B_y = ? AND
+        B_z = ? AND
+        B_strength = ? AND
+        B_type = ? AND
+        D = ? AND
+        J = ? AND
+        s = ? AND
+        N = ? AND
+        D_angle >= ? AND 
+        D_angle <= ?
+    """
+
+    def get_entries_by_angle_interval(
+        self, min_angle: number, max_angle: number, spin_ring: SpinRing
+    ) -> list[tuple[int, number]]:
+        rows = self._cursor.execute(
+            self._GET_PARAMETER_IDS_BY_ANGLE_INTERVAL_QUERY,
+            (
+                spin_ring.magnetic_field_direction_of_first_spin[indices_mapping["x"]],
+                spin_ring.magnetic_field_direction_of_first_spin[indices_mapping["y"]],
+                spin_ring.magnetic_field_direction_of_first_spin[indices_mapping["z"]],
+                spin_ring.magnetic_field_strength,
+                spin_ring.magnetic_field_type,
+                spin_ring.anisotropy_value,
+                spin_ring.heisenberg_interaction_constant,
+                spin_ring.spin,
+                spin_ring.number_of_spins,
+                min_angle,
+                max_angle,
+            ),
+        ).fetchall()
+        return [(self._get_row_data(row, "parameter_id"), self._get_row_data(row, "D_angle")) for row in rows]
+
+    _GET_PARAMETER_IDS_BY_MAGNETIC_FIELD_INTERVAL = """
+        SELECT parameter_id, B_strength
+        FROM parameters
+        WHERE 
+        B_x = ? AND
+        B_y = ? AND
+        B_z = ? AND
+        B_type = ? AND
+        D = ? AND
+        J = ? AND
+        s = ? AND
+        N = ? AND
+        D_angle = ? AND 
+        B_strength >= ? AND 
+        B_strength <= ?
+    """
+
+    def get_entries_by_magnetic_field_interval(
+        self,
+        spin_ring: SpinRing,
+        min_magnetic_field: number,
+        max_magnetic_field: number,
+    ) -> list[tuple[int, number]]:
+        rows = self._cursor.execute(
+            self._GET_PARAMETER_IDS_BY_MAGNETIC_FIELD_INTERVAL,
+            (
+                spin_ring.magnetic_field_direction_of_first_spin[indices_mapping["x"]],
+                spin_ring.magnetic_field_direction_of_first_spin[indices_mapping["y"]],
+                spin_ring.magnetic_field_direction_of_first_spin[indices_mapping["z"]],
+                spin_ring.magnetic_field_type,
+                spin_ring.anisotropy_value,
+                spin_ring.heisenberg_interaction_constant,
+                spin_ring.spin,
+                spin_ring.number_of_spins,
+                spin_ring.anisotropy_axes_angle,
+                min_magnetic_field,
+                max_magnetic_field,
+            ),
+        ).fetchall()
+        return [(self._get_row_data(row, "parameter_id"), self._get_row_data(row, "B_strength")) for row in rows]
