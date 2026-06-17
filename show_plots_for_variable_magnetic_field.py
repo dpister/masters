@@ -124,12 +124,15 @@ def main():
     )
     results.sort()
 
-    order = OrderGenerator(results)
+    order = OrderGenerator(
+        x_values=results.x_values, eigenvalues=results.eigenvalues, eigenvectors=results.eigenvectors
+    )
+    state_ordering_matrix = order.calculate_state_order_using_interpolation()
 
     for plotter in plotters:
         plotter.add_points(
             results=results,
-            color_map=order.state_ordering_matrix,
+            color_map=state_ordering_matrix,
         )
 
     import matplotlib.pyplot as plt
