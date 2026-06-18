@@ -9,7 +9,7 @@ def calculate_toroidal_moment(
     spins: list[Spin], eigenvalue_index: int, eigenvectors: np.ndarray, product_state_matrix: ProductStateMatrix
 ) -> np.ndarray:
 
-    result = np.zeros(3) * 1j
+    result = np.zeros(3, dtype=np.complex128)
 
     for spin_index, spin in enumerate(spins):
         spin_expectation_value = calculate_spin_expectation_value(
@@ -28,7 +28,7 @@ def calculate_toroidal_moment_from_spin_expectation_values(
     spins: list[Spin], spin_expectation_values: np.ndarray, eigenvalue_index: int
 ) -> np.ndarray:
 
-    result = np.zeros(3) * 0j
+    result = np.zeros(3, dtype=np.complex128)
 
     for spin_index, spin in enumerate(spins):
         spin_expectation_value = spin_expectation_values[eigenvalue_index, spin_index]

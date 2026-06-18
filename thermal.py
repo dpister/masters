@@ -14,7 +14,7 @@ def calculate_thermal_expectation_value(
     temperature: number,
     expectation_values: np.ndarray,
     eigenvalues: np.ndarray,
-) -> number:
+) -> complex:
     canonical_sum = calculate_canonical_partition_sum(temperature=temperature, eigenvalues=eigenvalues)
     result = 0
     for expectation_value, eigenvalue in zip(expectation_values, eigenvalues):

@@ -21,6 +21,7 @@ class SpinRing:
         circular = "circular"
 
     ZERO = np.array([0, 0, 0])
+    SMALL_X = np.array([0.00001, 0, 0])
 
     def __init__(
         self,
@@ -74,7 +75,12 @@ class SpinRing:
         if self.magnetic_field_type == self.MagneticFieldType.linear:
             return self.magnetic_field_direction_of_first_spin * magnetic_field_strength
         magnetic_field_direction = self._rotate_to_nth_position(self.magnetic_field_direction_of_first_spin, n)
-        return magnetic_field_direction * magnetic_field_strength + np.array([0.001, 0, 0])
+        return magnetic_field_direction * magnetic_field_strength
+
+    def _break_degeneracy(self, magnetic_field: np.ndarray) -> np.ndarray:
+        magnetic_field = magnetic_field + self.SMALL_X
+        magnetic_field /= np.linalg.norm(magnetic_field)
+        return magnetic_field
 
     def change_anisotropy_axes_angle(self, angle_degrees: number) -> SpinRing:
         self.anisotropy_axes_angle = angle_degrees

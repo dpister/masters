@@ -52,7 +52,7 @@ class ProductStateMatrix:
         self.number_of_spins = len(spin_values)
         self.number_of_single_spin_states = [int(2 * s + 1) for s in spin_values]
         self.number_of_product_states = self._calculate_number_of_states()
-        self.nparray = self.generate_nparray()
+        self.nparray = self._generate_nparray()
 
     def _calculate_number_of_states(self) -> int:
         self.number_of_product_states = 1
@@ -60,7 +60,7 @@ class ProductStateMatrix:
             self.number_of_product_states *= number_states
         return self.number_of_product_states
 
-    def generate_nparray(self) -> np.ndarray:
+    def _generate_nparray(self) -> np.ndarray:
         matrix = np.empty([self.number_of_spins, self.number_of_product_states])
         for state in range(self.number_of_product_states):
             remainder = state

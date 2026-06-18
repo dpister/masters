@@ -48,11 +48,10 @@ class EigenvaluePlotter(Plotter):
         results: Results,
         color_map: np.ndarray,
     ) -> None:
-
         new_x_values, new_eigenvalues = flatten(results.x_values, results.eigenvalues[:, : self.number_of_shown_states])
         _, new_color_map = flatten(results.x_values, color_map[:, : self.number_of_shown_states])
         self.plot_low.plot(new_x_values, new_eigenvalues, color_values=new_color_map)
-        # self.plot.plot(new_x_values, new_eigenvalues, color_values=new_color_map)
+        self.plot.plot(new_x_values, new_eigenvalues, color_values=new_color_map)
 
     def save(self, folder: str) -> None:
         path = os.path.join(folder, self.IMAGE_PATH)

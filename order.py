@@ -118,10 +118,7 @@ class OrderGenerator:
     def _find_best_next_point_with_fitting(
         self, x_index: int, state: int, number_of_candidates_up_and_down: int = 2
     ) -> int:
-
-        assert self.number_of_x_values > 2
         ordered_state = self._reversed_state_ordering[x_index - 1, state]
-
         x_values, past_eigenvalues, candidate_offsets = self._build_fitting_window(
             x_index, state, number_of_candidates_up_and_down
         )

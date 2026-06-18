@@ -14,14 +14,11 @@ def get_heisenberg_interaction_hamiltonian_matrix(
     Generate the Hamiltonian matrix for the Heisenberg interaction
     """
 
-    assert len(heisenberg_interaction_matrix.shape) == 2
-    assert heisenberg_interaction_matrix.shape[0] == heisenberg_interaction_matrix.shape[1]
-
     J = heisenberg_interaction_matrix
     number_of_spins = product_state_matrix.number_of_spins
     number_of_states = product_state_matrix.number_of_product_states
 
-    hamiltonian = np.zeros([number_of_states, number_of_states]) * 1j
+    hamiltonian = np.zeros([number_of_states, number_of_states], dtype=np.complex128)
 
     for i in range(number_of_states):
         for j in range(number_of_states):
@@ -67,7 +64,7 @@ def get_zeeman_hamiltonian_matrix(spins: list[Spin], product_state_matrix: Produ
     number_of_spins = product_state_matrix.number_of_spins
     number_of_states = product_state_matrix.number_of_product_states
 
-    hamiltonian = np.zeros([number_of_states, number_of_states]) * 1j
+    hamiltonian = np.zeros([number_of_states, number_of_states], dtype=np.complex128)
 
     for i in range(number_of_states):
         for j in range(number_of_states):
@@ -103,7 +100,7 @@ def get_anisotropy_hamiltonian_matrix(spins: list[Spin], product_state_matrix: P
     number_of_spins = product_state_matrix.number_of_spins
     number_of_states = product_state_matrix.number_of_product_states
 
-    hamiltonian = np.zeros([number_of_states, number_of_states]) * 1j
+    hamiltonian = np.zeros([number_of_states, number_of_states], dtype=np.complex128)
 
     for i in range(number_of_states):
         for j in range(number_of_states):

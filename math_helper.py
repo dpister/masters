@@ -56,10 +56,6 @@ def degree_to_radians(x_value: number) -> number:
     return x_value / 360 * 2 * PI
 
 
-def isclose(value1: complex_number, value2: complex_number, threshold: number = 1e-5) -> bool:
-    return abs(value2 - value1) < threshold
-
-
 def is_almost_real(array: np.ndarray, atol: number = 1e-12) -> bool:
     return np.allclose(np.imag(array), 0, atol=atol, rtol=0)
 
@@ -71,10 +67,9 @@ def sort_eigenvalues_and_eigenvectors(eigenvalues: np.ndarray, eigenvectors: np.
 
 
 def flatten(x_values: np.ndarray, y_values: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    assert len(y_values.shape) == 2
     num_x_values, num_y_values_per_x_value = y_values.shape
-    new_x_values = np.empty(num_x_values * num_y_values_per_x_value) * 0j
-    new_y_values = np.empty(num_x_values * num_y_values_per_x_value) * 0j
+    new_x_values = np.empty(num_x_values * num_y_values_per_x_value, dtype=x_values.dtype)
+    new_y_values = np.empty(num_x_values * num_y_values_per_x_value, dtype=y_values.dtype)
 
     for i, x_value in enumerate(x_values):
         for j, y_value in enumerate(y_values[i]):

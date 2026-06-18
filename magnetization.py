@@ -12,9 +12,9 @@ def calculate_magnetization(
     eigenvalue_index: int,
     eigenvectors: np.ndarray,
     product_state_matrix: ProductStateMatrix,
-) -> number:
+) -> complex:
 
-    result = 0
+    result = 0j
 
     for spin_index, spin in enumerate(spins):
         magnetic_field_direction = spin.B / np.linalg.norm(spin.B)
@@ -33,9 +33,9 @@ def calculate_magnetization_from_spin_expectation_values(
     spins: list[Spin],
     eigenvalue_index: int,
     spin_expectation_values: np.ndarray,
-) -> number:
+) -> complex:
 
-    result = 0
+    result = 0j
 
     for spin_index, spin in enumerate(spins):
         magnetic_field_direction = spin.B / np.linalg.norm(spin.B)

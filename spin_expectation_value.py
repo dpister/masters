@@ -11,7 +11,7 @@ def calculate_spin_expectation_value(
 
     number_of_states = product_state_matrix.number_of_product_states
 
-    result = np.zeros(3) * 1j
+    result = np.zeros(3, dtype=np.complex128)
 
     for i in range(number_of_states):
         for j in range(number_of_states):

@@ -124,8 +124,9 @@ def main():
     )
     results.sort()
 
+    print(results.eigenvectors[0])
     order = OrderGenerator(x_values=results.x_values, eigenvalues=results.eigenvalues)
-    state_ordering_matrix = order.calculate_state_order_using_fitting()
+    state_ordering_matrix = order.calculate_state_order_using_interpolation()
 
     for plotter in plotters:
         plotter.add_points(
