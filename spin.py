@@ -5,7 +5,7 @@ from math_helper import number
 
 
 class Spin:
-    """"""
+    """Represents one spin with its position, anisotropy, and magnetic field."""
 
     def __init__(
         self,

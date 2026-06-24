@@ -9,7 +9,7 @@ from math_helper import number
 
 @dataclass
 class Results:
-    """"""
+    """Container for calculated spectra and observables across sampled x-values."""
 
     product_state_matrix: ProductStateMatrix
     x_values: np.ndarray

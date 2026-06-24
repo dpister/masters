@@ -11,7 +11,7 @@ from subplots import Plot
 
 
 class SpinExpectationPlotter(Plotter):
-    """"""
+    """Builds and saves plots for spin expectation values by spin and direction."""
 
     IMAGE_PATH = "spin{spin_index}_dir_{direction}_spin_expval.png"
     IMAGE_PATH_THERMAL = "spin{spin_index}_dir_{direction}_spin_thermal_expval.png"

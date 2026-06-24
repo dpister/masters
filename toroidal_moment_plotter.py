@@ -9,7 +9,7 @@ from math_helper import flatten, number, indices_mapping
 
 
 class ToroidalMomentPlotter(Plotter):
-    """"""
+    """Builds and saves plots for toroidal moment expectation values and thermal averages."""
 
     IMAGE_PATH = "tor_moment_{direction}_expval.png"
     IMAGE_PATH_THERMAL = "tor_moment_{direction}_expval_thermal.png"
