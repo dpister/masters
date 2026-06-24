@@ -55,7 +55,9 @@ class SpinExpectationPlotter(Plotter):
                     ylabel=self.YLABEL_THERMAL.format(direction=direction, spin_index=spin_index),
                 )
 
-    def add_points(self, results: Results, color_map: np.ndarray) -> None:
+    def add_points(
+        self, results: Results, color_map: np.ndarray, label_order_x_value: number | None = None
+    ) -> None:
         if results.spin_expectation_values is None:
             return
         for spin_index, plots in enumerate(self.plots):
@@ -64,9 +66,12 @@ class SpinExpectationPlotter(Plotter):
                 new_x_values, new_spin_expectation_values = flatten(
                     results.x_values, results.spin_expectation_values[:, : self.number_of_shown_states, spin_index, i]
                 )
-                plot.plot(
-                    new_x_values, new_spin_expectation_values, color_values=color_map[:, : self.number_of_shown_states]
+                _, new_color_map = flatten(results.x_values, color_map[:, : self.number_of_shown_states])
+                plot.plot(new_x_values, new_spin_expectation_values, color_values=new_color_map)
+                labels, color_values = self._get_state_labels_and_colors(
+                    results.x_values, color_map, self.number_of_shown_states, label_order_x_value
                 )
+                plot.set_legend(labels=labels, color_values=color_values)
 
     def save(self, folder: str) -> None:
         for spin_index, plots in enumerate(self.plots):

@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 
-from math_helper import flatten
+from math_helper import flatten, number
 from plotter import Plotter
 from results import Results
 from subplots import Plot
@@ -47,11 +47,17 @@ class EigenvaluePlotter(Plotter):
         self,
         results: Results,
         color_map: np.ndarray,
+        label_order_x_value: number | None = None,
     ) -> None:
         new_x_values, new_eigenvalues = flatten(results.x_values, results.eigenvalues[:, : self.number_of_shown_states])
         _, new_color_map = flatten(results.x_values, color_map[:, : self.number_of_shown_states])
         self.plot_low.plot(new_x_values, new_eigenvalues, color_values=new_color_map)
         self.plot.plot(new_x_values, new_eigenvalues, color_values=new_color_map)
+        labels, color_values = self._get_state_labels_and_colors(
+            results.x_values, color_map, self.number_of_shown_states, label_order_x_value
+        )
+        self.plot_low.set_legend(labels=labels, color_values=color_values)
+        self.plot.set_legend(labels=labels, color_values=color_values)
 
     def save(self, folder: str) -> None:
         path = os.path.join(folder, self.IMAGE_PATH)

@@ -28,6 +28,7 @@ config: dict[str, Any] = {
                 "number_of_steps": 2001,
                 "x_axis_label": r"$B^\varphi$ in T",
                 "label_in_title": r"$\vec(B)=B\vec{e}^\varphi$",
+                "label_order_x_value": 0,
             },
             "spacial_average": {} # TODO
         },
@@ -41,6 +42,7 @@ config: dict[str, Any] = {
                 "end": 90,
                 "number_of_steps": 91,
                 "x_axis_label": r"$\varphi$ in $^\circ$",
+                "label_order_x_value": None,
             }
         },
     },

@@ -53,14 +53,21 @@ class ToroidalMomentPlotter(Plotter):
                 ylabel=self.YLABEL.format(direction=direction),
             )
 
-    def add_points(self, results: Results, color_map: np.ndarray) -> None:
+    def add_points(
+        self, results: Results, color_map: np.ndarray, label_order_x_value: number | None = None
+    ) -> None:
 
         if results.toroidal_moments is not None:
             for direction, plot in self.plots.items():
                 i = indices_mapping[direction]
                 toroidal_moments = results.toroidal_moments[:, : self.number_of_shown_states, i]
                 new_x_values, new_toroidal_moments = flatten(results.x_values, toroidal_moments)
-                plot.plot(new_x_values, new_toroidal_moments, color_values=color_map[:, : self.number_of_shown_states])
+                _, new_color_map = flatten(results.x_values, color_map[:, : self.number_of_shown_states])
+                plot.plot(new_x_values, new_toroidal_moments, color_values=new_color_map)
+                labels, color_values = self._get_state_labels_and_colors(
+                    results.x_values, color_map, self.number_of_shown_states, label_order_x_value
+                )
+                plot.set_legend(labels=labels, color_values=color_values)
 
         if results.toroidal_moments_thermal is not None:
             number_of_temperatures = len(results.temperatures)

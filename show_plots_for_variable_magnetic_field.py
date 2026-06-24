@@ -54,7 +54,8 @@ def main():
     images_folder: str = config["data"]["images_folder"]
     full_images_folder = os.path.join(images_folder, datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
 
-    number_of_shown_states = config["plot"]["number_of_shown_lowest_states"]
+    number_of_shown_states: int = config["plot"]["number_of_shown_lowest_states"]
+    label_order_x_value: number = variables["magnetic_field"]["range"]["label_order_x_value"]
 
     plotters: list[Plotter] = []
     eigenvalue_plotter = EigenvaluePlotter(
@@ -91,7 +92,7 @@ def main():
             spin_ring=spin_ring, min_magnetic_field=min_strength, max_magnetic_field=max_strength
         )
 
-    number_of_x_values = len(entries)  # TODO
+    number_of_x_values = len(entries)
     number_of_states = spin_ring.product_state_matrix.number_of_product_states
     x_values = np.empty(number_of_x_values)
     all_eigenvalues = np.empty([number_of_x_values, number_of_states])
@@ -124,7 +125,6 @@ def main():
     )
     results.sort()
 
-    print(results.eigenvectors[0])
     order = OrderGenerator(x_values=results.x_values, eigenvalues=results.eigenvalues)
     state_ordering_matrix = order.calculate_state_order_using_interpolation()
 
@@ -132,6 +132,7 @@ def main():
         plotter.add_points(
             results=results,
             color_map=state_ordering_matrix,
+            label_order_x_value=label_order_x_value,
         )
 
     import matplotlib.pyplot as plt
