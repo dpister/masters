@@ -13,7 +13,11 @@ def calculate_single_spin_alignment(
     product_state_matrix: ProductStateMatrix,
     eigenvectors: np.ndarray,
 ) -> complex:
-    """"""
+    """
+    Calculate the alignment of a single spin.
+    The alignment is defined as the expectation value of D * (s_i * e_i)^2 for a single i
+    where D is the anisotropy constant and e_i is the anisotropy axis of the spin.
+    """
 
     number_of_states = product_state_matrix.number_of_product_states
 
@@ -87,7 +91,11 @@ def calculate_alignment(
     product_state_matrix: ProductStateMatrix,
     eigenvectors: np.ndarray,
 ) -> complex:
-
+    """
+    Calculate the alignment of a spin system.
+    The alignment is defined as the expectation value of the sum over D * (s_i * e_i)^2
+    where D is the anisotropy constant and e_i are the anisotropy axes of the spins.
+    """
     result = 0j
 
     for spin_index, spin in enumerate(spins):

@@ -67,6 +67,12 @@ def sort_eigenvalues_and_eigenvectors(eigenvalues: np.ndarray, eigenvectors: np.
 
 
 def flatten(x_values: np.ndarray, y_values: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """
+    This function should be used when there is a data set to be plotted and there are multiple (N)
+    y values for every x value. Returns a new x value array with N times its original length where
+    every x value is copied N times and returns a one-dimensional flattened version of the y value array such
+    that the x values and the y values match.
+    """
     num_x_values, num_y_values_per_x_value = y_values.shape
     new_x_values = np.empty(num_x_values * num_y_values_per_x_value, dtype=x_values.dtype)
     new_y_values = np.empty(num_x_values * num_y_values_per_x_value, dtype=y_values.dtype)

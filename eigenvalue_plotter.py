@@ -9,7 +9,7 @@ from subplots import Plot
 
 
 class EigenvaluePlotter(Plotter):
-    """"""
+    """Plots the lowest eigenvalues and/or all eigenvalues of a hamiltonian matrix."""
 
     IMAGE_PATH = "low_eigenvalues.png"
     IMAGE_PATH_LOW = "all_eigenvalues.png"

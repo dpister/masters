@@ -8,7 +8,10 @@ from math_helper import number
 
 
 class OrderGenerator:
-    """"""
+    """
+    Generates an ordering for the eigenvalues / eigenstates such that the
+    ordering is consistent across crossings.
+    """
 
     def __init__(self, x_values: np.ndarray, eigenvalues: np.ndarray):
         self.x_values = x_values
@@ -30,6 +33,10 @@ class OrderGenerator:
         return self._reversed_state_ordering
 
     def calculate_state_order_using_overlap(self, eigenvectors: np.ndarray) -> np.ndarray:
+        """
+        Calculates ordering by calculating and maximizing the state overlap of 2 eigenvectors,
+        defined as the dot product of the 2 eigenvectors.
+        """
         self.reset_state_ordering()
         for k in range(1, self.number_of_x_values):
             for state in range(self.number_of_states):
@@ -56,6 +63,10 @@ class OrderGenerator:
         raise ValueError(f"No matching state found: x_index: {x_index}")
 
     def calculate_state_order_using_interpolation(self) -> np.ndarray:
+        """
+        Calculates ordering by interpolating a 2nd degree polynomial through past points
+        and using the closest point to the prediction to order the next point.
+        """
         self.reset_state_ordering()
         for k in range(1, self.number_of_x_values):
             #
@@ -107,6 +118,11 @@ class OrderGenerator:
         return predicted_next_eigenvalue
 
     def calculate_state_order_using_fitting(self) -> np.ndarray:
+        """
+        Calculates ordering by fitting a polynomial through past points AND future points
+        and looking for the best match. WARNING: The algorithm is pretty slow.
+        I haven't thrown it away because maybe it behaves better with more complex crossings.
+        """
         self.reset_state_ordering()
         for x_index in range(1, self.number_of_x_values):
             for state in range(self.number_of_states):

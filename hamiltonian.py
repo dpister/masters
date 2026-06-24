@@ -11,7 +11,9 @@ def get_heisenberg_interaction_hamiltonian_matrix(
     heisenberg_interaction_matrix: np.ndarray, product_state_matrix: ProductStateMatrix
 ) -> np.ndarray:
     """
-    Generate the Hamiltonian matrix for the Heisenberg interaction
+    Generate the Hamiltonian matrix for the Heisenberg interaction.
+    The Heisenberg interaction term is defined as a sum over J * s_i * s_j
+    where J is the heisenberg interaction constant and s_i and s_j are neighboring spins.
     """
 
     J = heisenberg_interaction_matrix
@@ -59,7 +61,11 @@ def get_heisenberg_interaction_hamiltonian_matrix(
 
 
 def get_zeeman_hamiltonian_matrix(spins: list[Spin], product_state_matrix: ProductStateMatrix) -> np.ndarray:
-    """Generate the Hamiltonian matrix of the Zeeman term using the product basis"""
+    """
+    Generate the Hamiltonian matrix of the Zeeman term.
+    The Zeeman term is defined as the sum over g * mu_B * B * s_i
+    where g is the Landé factor, mu_B the Bohr magneton, B the magnetic field as a vector.
+    """
 
     number_of_spins = product_state_matrix.number_of_spins
     number_of_states = product_state_matrix.number_of_product_states
@@ -94,7 +100,9 @@ def get_zeeman_hamiltonian_matrix(spins: list[Spin], product_state_matrix: Produ
 def get_anisotropy_hamiltonian_matrix(spins: list[Spin], product_state_matrix: ProductStateMatrix) -> np.ndarray:
     """
     Generate the Hamiltonian matrix of the anisotropy term of spins
-    with one main anisotropy axis using the product basis
+    with one main anisotropy axis.
+    The anisotropy term is defined as the sum over D * (s_i * e_i)^2
+    where D is the anisotropy constant and e_i are the anisotropy axes of the spins.
     """
 
     number_of_spins = product_state_matrix.number_of_spins
