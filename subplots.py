@@ -5,6 +5,7 @@
 # matplotlib.use("Agg")
 
 
+from matplotlib.colors import NoNorm
 from matplotlib.lines import Line2D
 import matplotlib.pyplot as plt
 import numpy as np
@@ -68,7 +69,10 @@ class Plot:
             self.ax.scatter(  # type: ignore
                 xvalues,
                 yvalues,
-                c=self._get_colors_from_values(color_values),
+                cmap=self.COLORMAP_NAME,
+                c=color_values,
+                vmin=0,
+                vmax=19,
                 marker=self.MARKER,
                 linewidths=self.LINEWIDTH,
                 rasterized=self.RASTERIZED,
@@ -85,16 +89,12 @@ class Plot:
             self.ax.legend(labels=labels, loc=self.LEGEND_LOCATION, fontsize=self.LEGEND_LABELSIZE)  # type: ignore
         else:
             colormap = plt.get_cmap(self.COLORMAP_NAME)
-            colors = self._get_colors_from_values(color_values)
+            colors = [colormap(v) for v in color_values]
             legend_elements = [
                 Line2D([0], [0], marker=self.MARKER, linestyle="", color=color, label=label)
                 for label, color in zip(labels, colors)
             ]
             self.ax.legend(handles=legend_elements, loc=self.LEGEND_LOCATION, fontsize=self.LEGEND_LABELSIZE)  # type: ignore
-
-    def _get_colors_from_values(self, color_values: np.ndarray | list[int]) -> list[tuple[float, float, float, float]]:
-        colormap = plt.get_cmap(self.COLORMAP_NAME)
-        return [colormap(int(color_value)) for color_value in np.asarray(color_values).ravel()]
 
     def save(self, path: str) -> None:
         self.fig.savefig(path, bbox_inches=self.BBOX_INCHES)  # type: ignore
