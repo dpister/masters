@@ -5,6 +5,23 @@ from math_helper import e_x, e_z
 
 config: dict[str, Any] = { 
 
+
+    "delete": {
+        "everything": False,
+        "range": "magnetic_field",
+        "delete_beyond_range": True,
+    },
+
+
+    "calculate": {
+        "spin_correlations": True,
+        "spin_expectation_values": True,
+        "toroidal_moment": True,
+        "magnetization": True,
+        "alignment": True,
+    },
+
+
     "variables": {
 
         "number_of_spins_N": 2,                            
@@ -47,49 +64,87 @@ config: dict[str, Any] = {
         },
     },
 
+
     "data": {
         "images_folder": "./images",
-        "parameter_database": "./parameters.db",
+        "parameter_database": "./database/parameters.db",
         "results_folder": "./results",
     },
 
+
     "plot": {
-            
-        "toggles": {
-            "should_save_plots": False,
-            "should_plot_eigenvalues": True,
-            "should_plot_all_eigenvalues": True,
-            "should_plot_spin_correlations": True,
-            "should_plot_spin_expectation_values": True,
-            "should_plot_toroidal_moment": False,
-            "should_plot_magnetization": True,
-            "should_disable_color_coding_for_lowest_eigenvalues": False
-        },
 
         "number_of_shown_lowest_states": 9,
+            
+        "eigenvalues": {
+            "generate_plots": True,
+            "plots_to_generate": ["low", "all"],
+            "y_limits": {"low": [], "all": []},
+        },
 
-        
-        "y_limits": {
-            "eigenvalues": {
-                "low": [],
-                "all": []
+        "toroidal_moment": {
+            "generate_plots": False,
+            "plots_to_generate": {
+                "normal": ["x", "y", "z"],
+                "thermal": ["x", "y", "z"],
             },
-            "toroidal_moment": {
-                "normal": {"x": [-3,3], "y": [-3,3], "z": [-3, 3]},
-                "thermal": {"x": [-3,3], "y": [-3,3], "z": [-3, 3]},
-            },
-            "spin_correlation": {
-                "normal": [],
-                "thermal": []
-            },
-            "spin_expectation": {
-                "normal": {"x": [-3,3], "y": [-3,3], "z": [-3, 3]},
-                "thermal": {"x": [], "y": [], "z": []},
-            },
-            "magnetization": {
-                "x": [-3,3], "y": [-3,3], "z": [-3, 3]
+            "y_limits": {
+                "normal": {"x": [], "y": [], "z": []},
+                "thermal": {"x": [], "y": [], "z": []}
             },
         },
+
+        "spin_correlation": {
+            "generate_plots": False,
+            "plots_to_generate": {
+                "normal": ["1 2", "2 3", "3 1"],
+                "thermal": ["1 2", "2 3", "3 1"],
+            },
+            "y_limits": {
+                "normal": {"1 2": []},
+                "thermal": {"1 2": []}
+            },
+        },
+
+        "spin_expectation": {
+            "generate_plots": False,
+            "plots_to_generate": {
+                "normal": ["1 x", "1 y", "1 z"],
+                "thermal": ["1 x", "1 y", "1 z"],
+            },
+            "y_limits": {
+                "normal": {"1 x": []},
+                "thermal": {"1 x": []}
+            },
+        },
+
+        "magnetization": {
+            "generate_plots": False,
+            "plots_to_generate": {
+                "normal": ["x", "y", "z"],
+                "thermal": ["x", "y", "z"],
+            },
+            "y_limits": {
+                "normal": {"x": [], "y": [], "z": []},
+                "thermal": {"x": [], "y": [], "z": []}
+            },
+        },
+
+        "alignment": {
+            "generate_plots": False,
+            "plots_to_generate": {
+                "normal": ["x", "y", "z"],
+                "thermal": ["x", "y", "z"],
+            },
+            "y_limits": {
+                "normal": {"x": [], "y": [], "z": []},
+                "thermal": {"x": [], "y": [], "z": []}
+            },
+        },
+
+
+
+
 
         "spin_correlation": {
             "normal": {
@@ -103,7 +158,6 @@ config: dict[str, Any] = {
                 "title": "$<\\hat{{\\vec{{s}}}_{spin1_index}\\cdot\\hat{{\\vec{{s}}}}_{spin2_index}>(T)$ für N={N}, s={s}, J={J} K, D={D} K, $\\vec{{B}}=${B}",            
             },
         },
-        
         "magnetization": {
             "thermal": {
                 "y_interval": {"x": [-2,2], "y": [-2,2], "z": [-2, 2]},
@@ -113,9 +167,7 @@ config: dict[str, Any] = {
         },
     },
 
-
     "paths": {
-
         "images": {
             "lowest_eigenvalues": "low_eigenvalues.png",
             "all_eigenvalues": "all_eigenvalues.png",
@@ -126,6 +178,5 @@ config: dict[str, Any] = {
             "magnetization": "M{direction}_magnetization_expval.png",
             "magnetization_thermal": "M{direction}_magnetization_thermal_expval.png",
         },
-
     }
 }
