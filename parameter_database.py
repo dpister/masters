@@ -229,3 +229,79 @@ class ParameterDatabase(Database):
             ),
         ).fetchall()
         return [(self._get_row_data(row, "parameter_id"), self._get_row_data(row, "B_strength")) for row in rows]
+
+    _GET_PARAMETER_IDS_BY_ANISOTROPY_AXES_FIXED_PARAMETERS_QUERY = """
+        SELECT parameter_id, D_angle
+        FROM parameters
+        WHERE
+        B_x = ? AND
+        B_y = ? AND
+        B_z = ? AND
+        B_strength = ? AND
+        B_type = ? AND
+        D = ? AND
+        J = ? AND
+        s = ? AND
+        N = ?
+    """
+
+    def get_entries_matching_anisotropy_axes_fixed_parameters(
+        self, spin_ring: SpinRing
+    ) -> list[tuple[int, number]]:
+        """All entries matching every parameter except D_angle, i.e. for any value of the anisotropy axes angle"""
+        rows = self._cursor.execute(
+            self._GET_PARAMETER_IDS_BY_ANISOTROPY_AXES_FIXED_PARAMETERS_QUERY,
+            (
+                spin_ring.magnetic_field_direction_of_first_spin[indices_mapping["x"]],
+                spin_ring.magnetic_field_direction_of_first_spin[indices_mapping["y"]],
+                spin_ring.magnetic_field_direction_of_first_spin[indices_mapping["z"]],
+                spin_ring.magnetic_field_strength,
+                spin_ring.magnetic_field_type,
+                spin_ring.anisotropy_value,
+                spin_ring.heisenberg_interaction_constant,
+                spin_ring.spin,
+                spin_ring.number_of_spins,
+            ),
+        ).fetchall()
+        return [(self._get_row_data(row, "parameter_id"), self._get_row_data(row, "D_angle")) for row in rows]
+
+    _GET_PARAMETER_IDS_BY_MAGNETIC_FIELD_FIXED_PARAMETERS_QUERY = """
+        SELECT parameter_id, B_strength
+        FROM parameters
+        WHERE
+        B_x = ? AND
+        B_y = ? AND
+        B_z = ? AND
+        B_type = ? AND
+        D = ? AND
+        J = ? AND
+        s = ? AND
+        N = ? AND
+        D_angle = ?
+    """
+
+    def get_entries_matching_magnetic_field_fixed_parameters(
+        self, spin_ring: SpinRing
+    ) -> list[tuple[int, number]]:
+        """All entries matching every parameter except B_strength, i.e. for any value of the magnetic field strength"""
+        rows = self._cursor.execute(
+            self._GET_PARAMETER_IDS_BY_MAGNETIC_FIELD_FIXED_PARAMETERS_QUERY,
+            (
+                spin_ring.magnetic_field_direction_of_first_spin[indices_mapping["x"]],
+                spin_ring.magnetic_field_direction_of_first_spin[indices_mapping["y"]],
+                spin_ring.magnetic_field_direction_of_first_spin[indices_mapping["z"]],
+                spin_ring.magnetic_field_type,
+                spin_ring.anisotropy_value,
+                spin_ring.heisenberg_interaction_constant,
+                spin_ring.spin,
+                spin_ring.number_of_spins,
+                spin_ring.anisotropy_axes_angle,
+            ),
+        ).fetchall()
+        return [(self._get_row_data(row, "parameter_id"), self._get_row_data(row, "B_strength")) for row in rows]
+
+    _DELETE_PARAMETERS_BY_ID_QUERY = "DELETE FROM parameters WHERE parameter_id = ?"
+
+    def delete_parameters(self, parameter_ids: list[int]) -> None:
+        self._cursor.executemany(self._DELETE_PARAMETERS_BY_ID_QUERY, [(parameter_id,) for parameter_id in parameter_ids])
+        self._connection.commit()
