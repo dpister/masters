@@ -7,9 +7,9 @@ config: dict[str, Any] = {
 
 
     "delete": {
-        "everything": False,
         "range": "magnetic_field",
         "delete_beyond_range": True,
+        "delete_all_temperatures": False
     },
 
 
@@ -75,6 +75,8 @@ config: dict[str, Any] = {
     "plot": {
 
         "number_of_shown_lowest_states": 9,
+        "show_plots": True,
+        "save_plots": False,
             
         "eigenvalues": {
             "generate_plots": True,
@@ -109,13 +111,13 @@ config: dict[str, Any] = {
         "spin_expectation": {
             "generate_plots": False,
             "plots_to_generate": {
-                "normal": ["1 x", "1 y", "1 z"],
-                "thermal": ["1 x", "1 y", "1 z"],
+                "normal": ["1 x", "1 y", "1 z", "2 x", "2 y", "2 z"],
+                "thermal": ["1 x", "1 y", "1 z", "2 x", "2 y", "2 z"],
             },
             "y_limits": {
-                "normal": {"1 x": []},
-                "thermal": {"1 x": []}
-            },
+                "normal": {"1 x": [], "1 y": [], "1 z": [], "2 x": [], "2 y": [], "2 z": []},
+                "thermal": {"1 x": [], "1 y": [], "1 z": [], "2 x": [], "2 y": [], "2 z": []}
+            }
         },
 
         "magnetization": {

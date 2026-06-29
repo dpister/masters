@@ -7,7 +7,7 @@ from math_helper import flatten, number, indices_mapping
 
 from plotter import Plotter
 from results import Results
-from subplots import Plot
+from subplots import Plot, Y_Interval
 
 
 class SpinExpectationPlotter(Plotter):
@@ -25,8 +25,8 @@ class SpinExpectationPlotter(Plotter):
         number_of_spins: int,
         xlabel: str,
         title_subinfo: str,
-        y_intervals: dict[str, tuple[int, int] | tuple[()]],
-        y_intervals_thermal: dict[str, tuple[int, int] | tuple[()]],
+        y_limits: dict[str, dict[str, Y_Interval]],
+        plots_to_generate: list[str],
     ):
         self.plots = [{"x": Plot(), "y": Plot(), "z": Plot()} for _ in range(number_of_spins)]
         self.thermal_plots = [{"x": Plot(), "y": Plot(), "z": Plot()} for _ in range(number_of_spins)]
@@ -39,7 +39,7 @@ class SpinExpectationPlotter(Plotter):
                 plot.configure(
                     xlabel=xlabel,
                     title=full_title,
-                    y_interval=y_intervals[direction],
+                    y_interval=y_limits["normal"][f"{spin_index + 1} {direction}"],
                     ylabel=self.YLABEL.format(direction=direction, spin_index=spin_index),
                 )
 
@@ -51,13 +51,11 @@ class SpinExpectationPlotter(Plotter):
                 plot.configure(
                     xlabel=xlabel,
                     title=full_title,
-                    y_interval=y_intervals_thermal[direction],
+                    y_interval=y_limits["thermal"][f"{spin_index + 1} {direction}"],
                     ylabel=self.YLABEL_THERMAL.format(direction=direction, spin_index=spin_index),
                 )
 
-    def add_points(
-        self, results: Results, color_map: np.ndarray, label_order_x_value: number | None = None
-    ) -> None:
+    def add_points(self, results: Results, color_map: np.ndarray, label_order_x_value: number | None = None) -> None:
         if results.spin_expectation_values is None:
             return
         for spin_index, plots in enumerate(self.plots):

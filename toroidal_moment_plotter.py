@@ -4,7 +4,7 @@ import numpy as np
 
 from plotter import Plotter
 from results import Results
-from subplots import Plot
+from subplots import Plot, Y_Interval
 from math_helper import flatten, number, indices_mapping
 
 
@@ -27,8 +27,8 @@ class ToroidalMomentPlotter(Plotter):
         temperatures: list[number],
         xlabel: str,
         title_subinfo: str,
-        y_intervals: dict[str, tuple[int, int] | tuple[()]],
-        y_intervals_thermal: dict[str, tuple[int, int] | tuple[()]],
+        y_limits: dict[str, dict[str, Y_Interval]],
+        plots_to_generate: list[str],
     ):
         self.plots = {"x": Plot(), "y": Plot(), "z": Plot()}
         self.thermal_plots = {"x": Plot(), "y": Plot(), "z": Plot()}
@@ -40,7 +40,7 @@ class ToroidalMomentPlotter(Plotter):
             plot.configure(
                 xlabel=xlabel,
                 title=full_title,
-                y_interval=y_intervals[direction],
+                y_interval=y_limits["normal"][direction],
                 ylabel=self.YLABEL.format(direction=direction),
             )
 
@@ -49,13 +49,11 @@ class ToroidalMomentPlotter(Plotter):
             plot.configure(
                 xlabel=xlabel,
                 title=full_title,
-                y_interval=y_intervals_thermal[direction],
+                y_interval=y_limits["thermal"][direction],
                 ylabel=self.YLABEL.format(direction=direction),
             )
 
-    def add_points(
-        self, results: Results, color_map: np.ndarray, label_order_x_value: number | None = None
-    ) -> None:
+    def add_points(self, results: Results, color_map: np.ndarray, label_order_x_value: number | None = None) -> None:
 
         if results.toroidal_moments is not None:
             for direction, plot in self.plots.items():

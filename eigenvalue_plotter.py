@@ -1,11 +1,12 @@
 import os
+from typing import Literal
 
 import numpy as np
 
 from math_helper import flatten, number
 from plotter import Plotter
 from results import Results
-from subplots import Plot
+from subplots import Plot, Y_Interval
 
 
 class EigenvaluePlotter(Plotter):
@@ -16,14 +17,15 @@ class EigenvaluePlotter(Plotter):
     YLABEL = r"$E_\nu$ in K"
     TITLE = "Eigenwerte $E_\\nu$"
     TITLE_LOW = "Unterste Eigenwerte $E_\\nu$"
+    type PlotType = Literal["low"] | Literal["all"]
 
     def __init__(
         self,
         number_of_shown_states: int,
         xlabel: str,
         title_subinfo: str,
-        y_interval: tuple[int, int] | tuple[()],
-        y_interval_low: tuple[int, int] | tuple[()],
+        y_limits: dict[str, Y_Interval],
+        plots_to_generate: list[PlotType],
     ):
         self.plot = Plot()
         self.plot_low = Plot()
@@ -33,13 +35,13 @@ class EigenvaluePlotter(Plotter):
         self.plot.configure(
             xlabel=xlabel,
             title=full_title,
-            y_interval=y_interval,
+            y_interval=y_limits["all"],
             ylabel=self.YLABEL,
         )
         self.plot_low.configure(
             xlabel=xlabel,
             title=full_title_low,
-            y_interval=y_interval_low,
+            y_interval=y_limits["low"],
             ylabel=self.YLABEL,
         )
 

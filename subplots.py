@@ -1,17 +1,12 @@
-# import matplotlib
-
-# better performance but can't show plots, only savefig
-# yes, you have to put it here (before the matplotlib.pyplot import)
-# matplotlib.use("Agg")
-
-
-from matplotlib.colors import NoNorm
 from matplotlib.lines import Line2D
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.style as mplstyle
 
 from math_helper import number
+
+
+type Y_Interval = tuple[number, number | tuple[()]]
 
 
 class Plot:
@@ -44,7 +39,7 @@ class Plot:
         xlabel: str | None = None,
         ylabel: str | None = None,
         title: str | None = None,
-        y_interval: tuple[number, number] | tuple[()] | None = None,
+        y_interval: Y_Interval | None = None,
     ) -> None:
         self.ax.tick_params(axis="both", labelsize=self.TICKSIZE)  # type: ignore
         if xlabel is not None:
@@ -54,7 +49,7 @@ class Plot:
         if title is not None:
             self.ax.set_title(title, fontsize=self.LABELSIZE)  # type: ignore
         if y_interval:
-            self.ax.set_ylim(y_interval)
+            self.ax.set_ylim(y_interval)  # type: ignore
 
     def plot(
         self,
